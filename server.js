@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const cors = require('cors');
+
 dotenv.config();
 const EmployeeRoute = require('./routes/employee');
 const AuthRoute = require('./routes/auth');
@@ -23,12 +25,13 @@ db.once('open', () => {
 
 const app = express();
 
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/uploads', express.static('uploads'));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Server is running on http//:localhost:${PORT}`);

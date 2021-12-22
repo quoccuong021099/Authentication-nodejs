@@ -7,36 +7,19 @@ const register = (req, res, next) => {
     if (err) {
       res.json({ err: err });
     }
-    let user = new User({
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-      password: hashedPass,
-    });
-    user
-      .save()
-      .then((user) => {
-        res.json({ nessage: 'User added successfully' });
-      })
-      .catch((err) => {
-        res.json({ nessage: 'An Error occured' });
-      });
-  });
-};
-
-const login = (req, res) => {
-  let username = req.body.username;
-  let password = req.body.password;
-
-  User.findOne({ $or: [{ email: username }, { phone: username }] }).then(
-    (user) => {
-      console.log('user', user);
+    User.findOne({ email: req.body.email }).then((user) => {
       if (user) {
-        bcrypt.compare(password, user.password, (err, result) => {
-          if (err) {
-            res.json({ error: err });
-          }
-          if (result) {
+        res.json({ message: 'User is existsed!', code: 4000 });
+      } else {
+        let user = new User({
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.phone,
+          password: hashedPass,
+        });
+        user
+          .save()
+          .then((user) => {
             let token = jwt.sign(
               { name: user.name },
               process.env.ACCESS_TOKEN_SECRET,
@@ -51,16 +34,62 @@ const login = (req, res) => {
                 expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
               }
             );
-            res.json({ message: 'Login success', token, refreshToken });
-          } else {
-            res.json({ message: 'Password does not match' });
-          }
-        });
-      } else {
-        res.json({ message: 'No user found!' });
+            res.json({
+              message: 'User added successfully',
+              data: user,
+              token,
+              refreshToken,
+              code: 200,
+            });
+          })
+          .catch((err) => {
+            res.json({ message: 'An Error occured', code: 2000 });
+          });
       }
+    });
+  });
+};
+
+const login = (req, res) => {
+  let username = req.body.email;
+  let password = req.body.password;
+
+  User.findOne({ $or: [{ email: username }] }).then((user) => {
+    console.log('user', user);
+    if (user) {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) {
+          res.json({ error: err });
+        }
+        if (result) {
+          let token = jwt.sign(
+            { name: user.name },
+            process.env.ACCESS_TOKEN_SECRET,
+            {
+              expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
+            }
+          );
+          let refreshToken = jwt.sign(
+            { name: user.name },
+            process.env.REFRESH_TOKEN_SECRET,
+            {
+              expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
+            }
+          );
+          res.json({
+            message: 'Login success',
+            token,
+            refreshToken,
+            code: 200,
+          });
+        } else {
+          res.json({ message: 'Password does not match' });
+        }
+      });
+    } else {
+      res.json({ message: 'No user found!' });
     }
-  );
+  });
 };
 
 const refreshToken = (req, res, next) => {

@@ -8,7 +8,7 @@ const index = (req, res, next) => {
         res.json({ response });
       })
       .catch((err) => {
-        res.json({ message: 'An error Occured' + err });
+        res.json({ message: 'An error Occured' + err, code: 2000 });
       });
   } else {
     Employee.find()
@@ -16,7 +16,7 @@ const index = (req, res, next) => {
         res.json({ response });
       })
       .catch((err) => {
-        res.json({ message: 'An error Occured' + err });
+        res.json({ message: 'An error Occured' + err, code: 2000 });
       });
   }
 };
@@ -29,7 +29,7 @@ const show = (req, res, next) => {
       res.json({ response });
     })
     .catch((err) => {
-      res.json({ message: 'An error Occured', error: err });
+      res.json({ message: 'An error Occured', error: err, code: 2000 });
     });
 };
 
@@ -53,10 +53,10 @@ const store = (req, res, next) => {
   employee
     .save()
     .then((response) => {
-      res.json({ message: 'Employee saved successfully' });
+      res.json({ message: 'Employee saved successfully', code: 200 });
     })
     .catch((error) => {
-      res.json({ message: 'An error Occured', error: err });
+      res.json({ message: 'An error Occured', error: err, code: 2000 });
     });
 };
 
@@ -74,10 +74,10 @@ const update = (req, res, next) => {
 
   Employee.findByIdAndUpdate(employeeID, { $set: updateData })
     .then((response) => {
-      res.json({ message: 'updated successfully' });
+      res.json({ message: 'updated successfully', code: 200 });
     })
     .catch((err) => {
-      res.json({ message: 'An error Occured', error: err });
+      res.json({ message: 'An error Occured', error: err, code: 2000 });
     });
 };
 
@@ -87,10 +87,10 @@ const destroy = (req, res, next) => {
   let employeeID = req.body.employeeID;
   Employee.findOneAndDelete(employeeID)
     .then((response) => {
-      res.json({ message: 'deleted successfully' });
+      res.json({ message: 'deleted successfully', code: 200 });
     })
     .catch((err) => {
-      res.json({ message: 'An error Occured', error: err });
+      res.json({ message: 'An error Occured', error: err, code: 2000 });
     });
 };
 
