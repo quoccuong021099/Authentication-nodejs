@@ -63,14 +63,14 @@ const login = (req, res) => {
         }
         if (result) {
           let token = jwt.sign(
-            { name: user.name },
+            { email: user.email },
             process.env.ACCESS_TOKEN_SECRET,
             {
               expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
             }
           );
           let refreshToken = jwt.sign(
-            { name: user.name },
+            { email: user.email },
             process.env.REFRESH_TOKEN_SECRET,
             {
               expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
@@ -99,7 +99,7 @@ const refreshToken = (req, res, next) => {
       res.status(400).json({ err });
     } else {
       let token = jwt.sign(
-        { name: decoded.name },
+        { email: decoded.email },
         process.env.ACCESS_TOKEN_SECRET,
         {
           expiresIn: process.env.ACCESS_TOKEN_EXPIRE_TIME,
